@@ -42,7 +42,7 @@ git clone https://github.com/solacese/geo-filtering
 
 ### 2. Build docker images
 
-Please build docker images of the [data-generator](https://github.com/solacese/connected-vehicle-data-generator) and [geo-filtering](https://github.com/solacese/geo-filtering).
+Please build docker images of the [data-generator](https://github.com/solacese/connected-vehicle-data-generator) and [geo-filtering](https://github.com/solacese/geo-filtering) by following the `Build Docker Image` section of the README. Then you should have image `ichen/geo-filtering:0.0.1` and `ichen/data-generator:0.0.1` in your machine.
 
 ```bash
 > docker image ls
@@ -56,7 +56,7 @@ openjdk                         11-jre-slim-buster      cc0d7e216e18   5 months 
 
 ### 3. Run the demo
 
-Run `docker-compose up` to create and start all 4 containers, wait for `Press Ctrl+C to exit` log to show up, then access [http://localhost:9090/](http://localhost:9090/) to enjoy the demo.
+Run `docker-compose up` to create and start all 4 parts, wait for the `Press Ctrl+C to exit` message to show up, then access [http://localhost:9090/](http://localhost:9090/) to enjoy the demo.
 
 ```bash
 cd connected-vehicle-local-runner/
