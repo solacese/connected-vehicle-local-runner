@@ -1,0 +1,60 @@
+# docker-compose up -d
+# docker exec -it solace cli -A
+version: "3.9"
+
+services:
+  solace:
+    image: solace/solace-pubsub-standard:latest
+    shm_size: 2g
+    ulimits:
+      nofile:
+        soft: 2448
+        hard: 38048
+    ports:
+      #Port Mappings:  Ports are mapped straight through from host to
+      #container.  This may result in port collisions on commonly used
+      #ports that will cause failure of the container to start.
+      #Web transport
+      - "8008:8008"
+      #REST Default VPN
+      - "9000:9000"
+      #MQTT Default VPN
+      - 1883:1883
+      #MQTT Default VPN over WebSockets
+      - 8000:8000
+      #SEMP / PubSub+ Manager
+      - "8080:8080"
+      #SMF Port 55555 in use on Mac OS Big Sur
+      - "44444:55555"
+    environment:
+      - username_admin_globalaccesslevel=admin
+      - username_admin_password=admin
+      - system_scaling_maxconnectioncount=1000
+
+  data-generator:
+    image: ichen/data-generator:0.0.1
+    depends_on:
+      - solace
+
+  geo-filtering:
+    image: ichen/geo-filtering:0.0.1
+    environment:
+      - solace_host=solace:55555
+      - solace_admin_url=http://solace:8080
+      - solace_rest_url=http://solace:9000
+    volumes:
+      - ./wait-for-solace-ready.sh:/app/wait-for-solace-ready.sh
+      - ./obo.sh:/app/obo.sh
+    command: sh -c './wait-for-solace-ready.sh && ./obo.sh && java -jar geo-filtering.jar'
+    depends_on:
+      - solace
+
+  web:
+    image: busybox:1.36.0
+    volumes:
+      - ../connected-vehicle-web:/var/www
+    command: busybox httpd -h /var/www -f -vv -p 80
+    ports:
+      - 9090:80
+    depends_on:
+      - solace
